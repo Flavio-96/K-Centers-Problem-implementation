@@ -47,7 +47,7 @@ ApproxCenters = {
     };
       
     randomApprox.windowResized = function(){
-
+      randomApprox.background(255);
       randomApprox.resizeCanvas(ApproxCenters.sketchContainer.elt.clientWidth, ApproxCenters.sketchContainer.elt.clientHeight);
 
       for (let city in ApproxCenters.cities){
@@ -63,10 +63,9 @@ ApproxCenters = {
       for (let center in ApproxCenters.centers){
         let tmpX = ApproxCenters.centers[center].x;;
         let tmpY = ApproxCenters.centers[center].y;
-
         randomApprox.fill(255,0,0);
         randomApprox.ellipse(tmpX, tmpY, 20, 20);
-        randomApprox.text(center+1, tmpX-5, tmpY+25);
+        randomApprox.text(parseInt(center)+1, tmpX-5, tmpY+25);
       }
     };
 
@@ -92,13 +91,19 @@ ApproxCenters = {
     };
 
     randomApprox.approxWithoutRAlgorithm = function () {
+      randomApprox.background(255);
+
       for (let city in ApproxCenters.cities){
         let tmpX = ApproxCenters.cities[city].x;;
         let tmpY = ApproxCenters.cities[city].y;
 
         randomApprox.fill(0,0,255);
         randomApprox.ellipse(tmpX, tmpY, 20, 20);
+        randomApprox.fill(0)
+        text = '('+tmpX+','+tmpY+')';
+        randomApprox.text(text, tmpX-20, tmpY-15);
       }
+
       UIManagement.legendCenters.textContent = "Centri: 0"; 
 
       ApproxCenters.centers = [];
