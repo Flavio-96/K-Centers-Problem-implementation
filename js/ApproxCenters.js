@@ -66,6 +66,7 @@ ApproxCenters = {
 
         randomApprox.fill(255,0,0);
         randomApprox.ellipse(tmpX, tmpY, 20, 20);
+        randomApprox.text(center+1, tmpX-5, tmpY+25);
       }
     };
 
@@ -107,7 +108,7 @@ ApproxCenters = {
       ApproxCenters.centers.push(firstCity);
       tmpCities.shift();
 
-      while(ApproxCenters.centers.length != ApproxCenters.centersNumber){
+      while((ApproxCenters.centers.length != ApproxCenters.centersNumber) && (ApproxCenters.centers.length != ApproxCenters.cities.length)){
         let distFromCenters = []
         tmpCities.forEach((city, cityIndex) =>{
           distFromCenters[cityIndex] = Number.MAX_SAFE_INTEGER;
@@ -131,7 +132,11 @@ ApproxCenters = {
     randomApprox.drawCenter = function(index){
       randomApprox.fill(255,0,0);
       UIManagement.legendCenters.textContent = "Centri: "+(index+1); 
-      randomApprox.ellipse(ApproxCenters.centers[index].x, ApproxCenters.centers[index].y, 20, 20);
+      
+      let x = ApproxCenters.centers[index].x;
+      let y = ApproxCenters.centers[index].y;
+      randomApprox.ellipse(x, y, 20, 20);
+      randomApprox.text(index+1, x-5, y+25);
     }
 
   },
