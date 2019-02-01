@@ -1,8 +1,18 @@
 html,
 body {
   height: 100%;
+  overflow:hidden;
+}
+
+.navbar {
+  height: 5vh;
 }
 
 .sketchContent {
-  height: 90vh;
+  height: 95vh;
+}
+
+button.disabled {
+  cursor: not-allowed;
+  pointer-events: all !important;
 }
