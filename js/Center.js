@@ -30,8 +30,10 @@ class Center {
     
     mouseDragged() {
         if (this.active) {
-            this.x = Math.round(mouseX);
-            this.y = Math.round(mouseY);
+            if((width*0.001 < mouseX && mouseX < (width - width*0.001)) && (height*0.001 < mouseY && mouseY < (height - height*0.001))){
+                this.x = Math.round(mouseX);
+                this.y = Math.round(mouseY);
+            }
         }
         return false;
     }
