@@ -1,24 +1,25 @@
-class City {
+class Center {
     x = 0;
     y = 0;
     radius = 25;
     active = false;
-    col = color(0,0,255);
+    col = null;
+    number = 0;
 
-    constructor(xPoint, yPoint) {
+    constructor(xPoint, yPoint, color, number) {
         this.x = xPoint;
         this.y = yPoint;
+        this.col = color;
+        this.number = number;
     }
 
     display(){
         fill(this.col);
         ellipse(this.x, this.y, this.radius, this.radius);
-        let coordinatesText = '('+this.x+','+this.y+')';
-        fill(0)
-        text(coordinatesText, this.x-this.radius, this.y-this.radius);
+        text(this.number, this.x-3, this.y+30);
     }
 
-    cityPressed() {
+    centerPressed() {
         let distance = dist(mouseX, mouseY, this.x, this.y);
         if (distance < this.radius/2) 
             this.active = true;

@@ -1,271 +1,201 @@
-ApproxCenters = {
-  canvas: null,
+var sketchContainer = null;
 
-  cities : [],
-  centers: [],
-  centersNumber: 0,
-  citiesNumber: 0,
+async function setup(){
+  await UIManagement.getUIreferences();
+  ElementsManagement.cities = [];
+  sketchContainer = createDiv();
   
-  sketchContainer: null,
+  sketchContainer.id('canvasContainer');
+  sketchContainer.addClass('sketchContent');
+  canvas = createCanvas(sketchContainer.elt.clientWidth, sketchContainer.elt.clientHeight);
 
-  repeatCustumCallbackDelay: function (callbackObject, delay, repetitions) {
-    let x = 0;
-    let callbackFunction = callbackObject['callbackFunction'];
+  canvas.parent(sketchContainer);
+}
 
-    return new Promise((resolve,reject) => {
-      let intervalID = window.setInterval(function () {
-        if(callbackObject['params'])
-          callbackFunction(x);
-        else
-          callbackFunction();
-        
-          if (++x == repetitions) {
-            window.clearInterval(intervalID);
-            resolve();
-        }
-      }, delay);
-    })
-  },
+function windowResized(){
+  background(255);
+  resizeCanvas(sketchContainer.elt.clientWidth, sketchContainer.elt.clientHeight);
+}
 
-  randomPoints : function(randomApprox){
-    
-    randomApprox.setup = function() {
-      ApproxCenters.cities = [];
-      ApproxCenters.sketchContainer = randomApprox.createDiv();
-      
-      ApproxCenters.sketchContainer.id('canvasContainer');
-      ApproxCenters.sketchContainer.addClass('sketchContent');
-      ApproxCenters.canvas = randomApprox.createCanvas(ApproxCenters.sketchContainer.elt.clientWidth, ApproxCenters.sketchContainer.elt.clientHeight);
+function draw(){
+  background(255);
 
-      ApproxCenters.canvas.parent(ApproxCenters.sketchContainer);
-      randomApprox.noStroke();
-      randomApprox.setXRandomCities();
+  let tmpAlgCenters = findNearestCenters(ElementsManagement.algorithmCenters);
+  let tmpArbCenters = findNearestCenters(ElementsManagement.arbitraryCenters);
 
-      UIManagement.calculateCentersButton[0].onclick = ()=>{
-        if(!UIManagement.calculateCentersButton.hasClass("disabled"))
-            randomApprox.approxWithoutRAlgorithm();
+  for (let city in ElementsManagement.cities){
+    ElementsManagement.cities[city].display();
+
+    let x1 = ElementsManagement.cities[city].x;
+    let y1 = ElementsManagement.cities[city].y
+
+    if(tmpAlgCenters[city]){
+      let x2 = tmpAlgCenters[city].center[0];
+      let y2 = tmpAlgCenters[city].center[1];
+      let d = int(tmpAlgCenters[city].dist);
+      if(d != 0){
+        if(tmpAlgCenters[city]['minradius'])
+          strokeWeight(6);
+        stroke('red');
+
+        line(x1, y1, x2, y2);
+        push();
+        let m = (y2 - y1) / (x2 - x1);
+        let textx = (x2 + x1) / 2;
+        let texty = m*textx - m*x1 + y1;
+
+        strokeWeight(1);
+        noStroke();
+        text(nfc(d, 1), textx, texty);
+        pop();  
       }
-    };
-      
-    randomApprox.windowResized = function(){
-      randomApprox.background(255);
-      randomApprox.resizeCanvas(ApproxCenters.sketchContainer.elt.clientWidth, ApproxCenters.sketchContainer.elt.clientHeight);
-
-      for (let city in ApproxCenters.cities){
-        let tmpX = ApproxCenters.cities[city].x;;
-        let tmpY = ApproxCenters.cities[city].y;
-
-        randomApprox.fill(0,0,255);
-        randomApprox.ellipse(tmpX, tmpY, 20, 20);
-        randomApprox.fill(0)
-        text = '('+tmpX+','+tmpY+')';
-        randomApprox.text(text, tmpX-20, tmpY-15);
-      }
-      for (let center in ApproxCenters.centers){
-        let tmpX = ApproxCenters.centers[center].x;;
-        let tmpY = ApproxCenters.centers[center].y;
-        randomApprox.fill(255,0,0);
-        randomApprox.ellipse(tmpX, tmpY, 20, 20);
-        randomApprox.text(parseInt(center)+1, tmpX-5, tmpY+25);
-      }
-    };
-
-    randomApprox.setXRandomCities = async function(){
-      let callbackObject = {callbackFunction:randomApprox.setRandomCity}
-      await ApproxCenters.repeatCustumCallbackDelay(callbackObject, 700, ApproxCenters.citiesNumber);
-      UIManagement.calculateCentersButton.removeClass("disabled");
-    };
-
-    randomApprox.setRandomCity = function(){
-      let x;
-      let y;
-
-      do{
-        x = Math.round(randomApprox.random(randomApprox.width));
-        y = Math.round(randomApprox.random(randomApprox.height));
-      } while(!(randomApprox.width*0.05 < x && x < (randomApprox.width - randomApprox.width*0.05)) || !(randomApprox.height*0.05 < y && y < (randomApprox.height - randomApprox.height*0.05)))
-      CityManagement.addCity(x,y);
-      UIManagement.legendCities.textContent = "Cities: "+ApproxCenters.cities.length; 
-      randomApprox.fill(0,0,255);
-      randomApprox.ellipse(x, y, 20, 20);
-      text = '('+x+','+y+')';
-      randomApprox.fill(0)
-      randomApprox.text(text, x-20, y-15);
-    };
-
-    randomApprox.approxWithoutRAlgorithm = function () {
-      randomApprox.background(255);
-
-      for (let city in ApproxCenters.cities){
-        let tmpX = ApproxCenters.cities[city].x;;
-        let tmpY = ApproxCenters.cities[city].y;
-
-        randomApprox.fill(0,0,255);
-        randomApprox.ellipse(tmpX, tmpY, 20, 20);
-        randomApprox.fill(0)
-        text = '('+tmpX+','+tmpY+')';
-        randomApprox.text(text, tmpX-20, tmpY-15);
-      }
-
-      UIManagement.legendCenters.textContent = "Centers: 0"; 
-
-      ApproxCenters.centers = [];
-      let tmpCities = ApproxCenters.cities.slice(0);
-
-      let firstCity = tmpCities[0];
-      ApproxCenters.centers.push(firstCity);
-      tmpCities.shift();
-
-      while((ApproxCenters.centers.length != ApproxCenters.centersNumber) && (ApproxCenters.centers.length != ApproxCenters.cities.length)){
-        let distFromCenters = []
-        tmpCities.forEach((city, cityIndex) =>{
-          distFromCenters[cityIndex] = Number.MAX_SAFE_INTEGER;
-
-          ApproxCenters.centers.forEach((center, centerIndex) =>{
-            tmpDist = randomApprox.dist(city.x, city.y , center.x, center.y)
-            if(tmpDist < distFromCenters[cityIndex]){
-              distFromCenters[cityIndex] = tmpDist;
-            }
-          })
-        })
-        let maxCity = distFromCenters.indexOf(Math.max(...distFromCenters));
-        let newCenter = tmpCities[maxCity];
-        ApproxCenters.centers.push(newCenter);
-
-        tmpCities.splice(maxCity,1);
-      }
-      let callbackObject = {callbackFunction:randomApprox.drawCenter,params:true}
-      ApproxCenters.repeatCustumCallbackDelay(callbackObject,1000, ApproxCenters.centers.length);
-    };
-
-    randomApprox.drawCenter = function(index){
-      randomApprox.fill(255,0,0);
-      UIManagement.legendCenters.textContent = "Centers: "+(index+1); 
-      
-      let x = ApproxCenters.centers[index].x;
-      let y = ApproxCenters.centers[index].y;
-      randomApprox.ellipse(x, y, 20, 20);
-      randomApprox.text(index+1, x-5, y+25);
     }
+    if(tmpArbCenters[city]){
+      let x2 = tmpArbCenters[city].center[0];
+      let y2 = tmpArbCenters[city].center[1];
+      let d = int(tmpArbCenters[city].dist);
 
-  },
-  arbitraryPoints : function(arbitraryApprox){
+      strokeWeight(1);
+      stroke('green');
+      if(tmpArbCenters[city]['minradius']){
+        strokeWeight(6);
+      }
+
+      line(x1, y1, x2, y2);
+      push();
+      let m = (y2 - y1) / (x2 - x1);
+      let textx = (x2 + x1) / 2;
+      let texty = m*textx - m*x1 + y1;
     
-    arbitraryApprox.setup = function() {
-      ApproxCenters.cities = [];
-      ApproxCenters.sketchContainer = arbitraryApprox.createDiv();
+      strokeWeight(1);
+      noStroke();
+      text(nfc(d, 1), textx, texty);
+
+      pop();
       
-      ApproxCenters.sketchContainer.id('canvasContainer');
-      ApproxCenters.sketchContainer.addClass('sketchContent');
-      ApproxCenters.canvas = arbitraryApprox.createCanvas(ApproxCenters.sketchContainer.elt.clientWidth, ApproxCenters.sketchContainer.elt.clientHeight);
-
-      ApproxCenters.canvas.parent(ApproxCenters.sketchContainer);
-      arbitraryApprox.noStroke();
-
-      UIManagement.calculateCentersButton[0].onclick = ()=>{
-        if(!UIManagement.calculateCentersButton.hasClass("disabled"))
-          arbitraryApprox.approxWithoutRAlgorithm();
-      }
-    };
-      
-    arbitraryApprox.windowResized = function(){
-      arbitraryApprox.background(255);
-      arbitraryApprox.resizeCanvas(ApproxCenters.sketchContainer.elt.clientWidth, ApproxCenters.sketchContainer.elt.clientHeight);
-
-      for (let city in ApproxCenters.cities){
-        let tmpX = ApproxCenters.cities[city].x;;
-        let tmpY = ApproxCenters.cities[city].y;
-
-        arbitraryApprox.fill(0,0,255);
-        arbitraryApprox.ellipse(tmpX, tmpY, 20, 20);
-        arbitraryApprox.fill(0)
-        text = '('+tmpX+','+tmpY+')';
-        arbitraryApprox.text(text, tmpX-20, tmpY-15);
-      }
-      for (let center in ApproxCenters.centers){
-        let tmpX = ApproxCenters.centers[center].x;;
-        let tmpY = ApproxCenters.centers[center].y;
-        arbitraryApprox.fill(255,0,0);
-        arbitraryApprox.ellipse(tmpX, tmpY, 20, 20);
-        arbitraryApprox.text(parseInt(center)+1, tmpX-5, tmpY+25);
-      }
-    };
-
-    arbitraryApprox.mouseClicked = function(){
-      let x = Math.round(arbitraryApprox.mouseX);
-      let y = Math.round(arbitraryApprox.mouseY);
-      console.log(arbitraryApprox.width)
-      if((arbitraryApprox.width*0.001 < x && x < (arbitraryApprox.width - arbitraryApprox.width*0.001)) && (arbitraryApprox.height*0.001 < y && y < (arbitraryApprox.height - arbitraryApprox.height*0.001)))
-        if(arbitraryApprox.mouseButton == arbitraryApprox.LEFT){
-          let x = Math.round(arbitraryApprox.mouseX);
-          let y = Math.round(arbitraryApprox.mouseY);
-
-          CityManagement.addCity(x,y);
-          UIManagement.legendCities.textContent = "Cities: "+ApproxCenters.cities.length; 
-          arbitraryApprox.fill(0,0,255);
-          arbitraryApprox.ellipse(x, y, 20, 20);
-          text = '('+x+','+y+')';
-          arbitraryApprox.fill(0)
-          arbitraryApprox.text(text, x-20, y-15);
-          if(UIManagement.calculateCentersButton.hasClass("disabled"))
-            UIManagement.calculateCentersButton.removeClass("disabled");
-        }
-    };
-
-    arbitraryApprox.approxWithoutRAlgorithm = function () {
-      arbitraryApprox.background(255);
-
-      for (let city in ApproxCenters.cities){
-        let tmpX = ApproxCenters.cities[city].x;;
-        let tmpY = ApproxCenters.cities[city].y;
-
-        arbitraryApprox.fill(0,0,255);
-        arbitraryApprox.ellipse(tmpX, tmpY, 20, 20);
-        arbitraryApprox.fill(0)
-        text = '('+tmpX+','+tmpY+')';
-        arbitraryApprox.text(text, tmpX-20, tmpY-15);
-      }
-
-      UIManagement.legendCenters.textContent = "Centers: 0"; 
-
-      ApproxCenters.centers = [];
-      let tmpCities = ApproxCenters.cities.slice(0);
-
-      let firstCity = tmpCities[0];
-      ApproxCenters.centers.push(firstCity);
-      tmpCities.shift();
-
-      while((ApproxCenters.centers.length != ApproxCenters.centersNumber) && (ApproxCenters.centers.length != ApproxCenters.cities.length)){
-        let distFromCenters = []
-        tmpCities.forEach((city, cityIndex) =>{
-          distFromCenters[cityIndex] = Number.MAX_SAFE_INTEGER;
-
-          ApproxCenters.centers.forEach((center, centerIndex) =>{
-            tmpDist = arbitraryApprox.dist(city.x, city.y , center.x, center.y)
-            if(tmpDist < distFromCenters[cityIndex]){
-              distFromCenters[cityIndex] = tmpDist;
-            }
-          })
-        })
-        let maxCity = distFromCenters.indexOf(Math.max(...distFromCenters));
-        let newCenter = tmpCities[maxCity];
-        ApproxCenters.centers.push(newCenter);
-
-        tmpCities.splice(maxCity,1);
-      }
-      let callbackObject = {callbackFunction:arbitraryApprox.drawCenter,params:true}
-      ApproxCenters.repeatCustumCallbackDelay(callbackObject,1000, ApproxCenters.centers.length);
-    };
-
-    arbitraryApprox.drawCenter = function(index){
-      arbitraryApprox.fill(255,0,0);
-      UIManagement.legendCenters.textContent = "Centers: "+(index+1); 
-      
-      let x = ApproxCenters.centers[index].x;
-      let y = ApproxCenters.centers[index].y;
-      arbitraryApprox.ellipse(x, y, 20, 20);
-      arbitraryApprox.text(index+1, x-5, y+25);
-    };
-
+    }
+    strokeWeight(1);
+    noStroke();
   }
+
+  for (let centers in ElementsManagement.arbitraryCenters){
+    ElementsManagement.arbitraryCenters[centers].display();
+  }
+
+  for (let centers in ElementsManagement.algorithmCenters){
+    ElementsManagement.algorithmCenters[centers].display();
+  }
+}
+
+function mousePressed(){
+  if(UIManagement.showingAlert)
+    return;
+
+  let x = Math.round(mouseX);
+  let y = Math.round(mouseY);
+  if((width*0.001 < x && x < (width - width*0.001)) && (height*0.001 < y && y < (height - height*0.001))){
+    if(UIManagement.cityMode){
+      let tmpSet = new Set();
+      let indexOfSelected = -1;
+      for (let city in ElementsManagement.cities){
+        tmpSelected = ElementsManagement.cities[city].cityPressed();
+        tmpSet.add(tmpSelected);
+        if(tmpSelected)
+          indexOfSelected = city;
+      }
+      if(mouseButton == LEFT){
+        if(!tmpSet.has(true)){
+          newCity = ElementsManagement.addCity(x,y);
+          newCity.display();
+        }
+      }else if(mouseButton == RIGHT && indexOfSelected != -1){
+        ElementsManagement.removeCity(indexOfSelected);
+      }
+    }else if(UIManagement.centerMode){
+      let tmpSet = new Set();
+      let indexOfSelected = -1;
+      for (let center in ElementsManagement.arbitraryCenters){
+        tmpSelected = ElementsManagement.arbitraryCenters[center].centerPressed();
+        tmpSet.add(tmpSelected);
+        if(tmpSelected)
+          indexOfSelected = center;
+      }
+      if(mouseButton == LEFT){
+        if(!tmpSet.has(true)){
+          newCenter = ElementsManagement.addArbitraryCenter(x,y);
+          newCenter.display();
+        }
+      }else if(mouseButton == RIGHT && indexOfSelected != -1){
+          ElementsManagement.removeArbitraryCenter(indexOfSelected);
+      }
+    }
+  }
+}
+
+function mouseDragged() {
+  if(UIManagement.cityMode){
+    for (let city in ElementsManagement.cities){
+      ElementsManagement.cities[city].mouseDragged();
+    }
+  }else{
+    for (let center in ElementsManagement.arbitraryCenters){
+      ElementsManagement.arbitraryCenters[center].mouseDragged();
+    }
+  }
+}
+
+function approxWithoutRAlgorithm() {
+  ElementsManagement.algorithmCenters.length = 0;
+  let centersNumber = ElementsManagement.centersNumber;
+  let tmpCities = ElementsManagement.cities.slice(0);
+
+  let firstCityIndex = Math.floor(Math.random()*tmpCities.length);
+  let firstCity = tmpCities[firstCityIndex];
+  let newCenter = ElementsManagement.addAlgorithmCenter(firstCity.x,firstCity.y);
+  newCenter.display();
+
+  tmpCities.splice(firstCityIndex,1);
+
+  while((ElementsManagement.algorithmCenters.length != centersNumber) && (ElementsManagement.algorithmCenters.length != ElementsManagement.cities.length)){
+    let distFromCenters = []
+    tmpCities.forEach((city, cityIndex) =>{
+      distFromCenters[cityIndex] = Number.MAX_SAFE_INTEGER;
+      ElementsManagement.algorithmCenters.forEach((center, centerIndex) =>{
+        tmpDist = dist(city.x, city.y , center.x, center.y)
+        if(tmpDist < distFromCenters[cityIndex]){
+          distFromCenters[cityIndex] = tmpDist;
+        }
+      })
+    })
+    let maxCity = distFromCenters.indexOf(Math.max(...distFromCenters));
+    let tmpNewCenter = tmpCities[maxCity];
+    newCenter = ElementsManagement.addAlgorithmCenter(tmpNewCenter.x,tmpNewCenter.y);
+    newCenter.display();
+
+    tmpCities.splice(maxCity,1);
+  }
+}
+ 
+function findNearestCenters(arrayCenters){
+  let nearestCenter = [];
+  let distFromCenters = [];
+  let minFound = {radiusIndex:-1,value:Number.MAX_SAFE_INTEGER}
+  ElementsManagement.cities.forEach((city, cityIndex) =>{
+    nearestCenter[cityIndex] = null;
+    distFromCenters[cityIndex] = Number.MAX_SAFE_INTEGER;
+    arrayCenters.forEach((center, centerIndex) =>{
+      tmpDist = dist(city.x, city.y , center.x, center.y)
+      if(tmpDist < distFromCenters[cityIndex]){
+        distFromCenters[cityIndex] = tmpDist; 
+        nearestCenter[cityIndex] = {center:[center.x ,center.y],dist:tmpDist};
+        if(tmpDist != 0 && tmpDist < minFound['value']){
+          minFound['radiusIndex'] = cityIndex;
+          minFound['value'] = tmpDist;
+        }
+      }
+    })
+  })
+  if(minFound['radiusIndex'] != -1)
+    nearestCenter[minFound['radiusIndex']]['minradius'] = true;
+  return nearestCenter;
 }
