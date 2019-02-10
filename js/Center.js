@@ -1,14 +1,10 @@
 class Center {
-    x = 0;
-    y = 0;
-    radius = 25;
-    active = false;
-    col = null;
-    number = 0;
 
     constructor(xPoint, yPoint, color, number) {
         this.x = xPoint;
         this.y = yPoint;
+        this.radius = 25;
+        this.active = false;
         this.col = color;
         this.number = number;
     }

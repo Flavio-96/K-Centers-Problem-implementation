@@ -1,13 +1,11 @@
 class City {
-    x = 0;
-    y = 0;
-    radius = 25;
-    active = false;
-    col = color(0,0,255);
 
     constructor(xPoint, yPoint) {
         this.x = xPoint;
         this.y = yPoint;
+        this.radius = 25;
+        this.active = false;
+        this.col = color(0,0,255); 
     }
 
     display(){

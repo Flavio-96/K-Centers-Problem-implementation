@@ -8,6 +8,7 @@ async function setup(){
   sketchContainer.id('canvasContainer');
   sketchContainer.addClass('sketchContent');
   canvas = createCanvas(sketchContainer.elt.clientWidth, sketchContainer.elt.clientHeight);
+  textSize(15);
 
   canvas.parent(sketchContainer);
 }
@@ -44,35 +45,35 @@ function draw(){
         let textx = (x2 + x1) / 2;
         let texty = m*textx - m*x1 + y1;
 
-        strokeWeight(1);
-        noStroke();
+        strokeWeight(0.5);
+        stroke('black');
         text(nfc(d, 1), textx, texty);
         pop();  
-      }
+      } 
     }
     if(tmpArbCenters[city]){
       let x2 = tmpArbCenters[city].center[0];
       let y2 = tmpArbCenters[city].center[1];
       let d = int(tmpArbCenters[city].dist);
 
-      strokeWeight(1);
-      stroke('green');
-      if(tmpArbCenters[city]['minradius']){
-        strokeWeight(6);
-      }
+      if(d != 0){
+        strokeWeight(1);
+        stroke('green');
+        if(tmpArbCenters[city]['minradius']){
+          strokeWeight(6);
+        }
 
-      line(x1, y1, x2, y2);
-      push();
-      let m = (y2 - y1) / (x2 - x1);
-      let textx = (x2 + x1) / 2;
-      let texty = m*textx - m*x1 + y1;
-    
-      strokeWeight(1);
-      noStroke();
-      text(nfc(d, 1), textx, texty);
-
-      pop();
+        line(x1, y1, x2, y2);
+        push();
+        let m = (y2 - y1) / (x2 - x1);
+        let textx = (x2 + x1) / 2;
+        let texty = m*textx - m*x1 + y1;
       
+        strokeWeight(0.5);
+        stroke('black');
+        text(nfc(d, 1), textx, texty);
+        pop();
+      }        
     }
     strokeWeight(1);
     noStroke();
@@ -179,23 +180,22 @@ function approxWithoutRAlgorithm() {
 function findNearestCenters(arrayCenters){
   let nearestCenter = [];
   let distFromCenters = [];
-  let minFound = {radiusIndex:-1,value:Number.MAX_SAFE_INTEGER}
+  let check = false;
   ElementsManagement.cities.forEach((city, cityIndex) =>{
     nearestCenter[cityIndex] = null;
     distFromCenters[cityIndex] = Number.MAX_SAFE_INTEGER;
     arrayCenters.forEach((center, centerIndex) =>{
+      check = true;
       tmpDist = dist(city.x, city.y , center.x, center.y)
       if(tmpDist < distFromCenters[cityIndex]){
         distFromCenters[cityIndex] = tmpDist; 
         nearestCenter[cityIndex] = {center:[center.x ,center.y],dist:tmpDist};
-        if(tmpDist != 0 && tmpDist < minFound['value']){
-          minFound['radiusIndex'] = cityIndex;
-          minFound['value'] = tmpDist;
-        }
       }
     })
   })
-  if(minFound['radiusIndex'] != -1)
-    nearestCenter[minFound['radiusIndex']]['minradius'] = true;
+  let maxCity = distFromCenters.indexOf(Math.max(...distFromCenters));
+  if(maxCity != -1 && check)
+    nearestCenter[maxCity]['minradius'] = true;
+
   return nearestCenter;
 }
