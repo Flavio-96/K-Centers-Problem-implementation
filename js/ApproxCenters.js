@@ -112,7 +112,7 @@ function mousePressed(){
       }else if(mouseButton == RIGHT && indexOfSelected != -1){
         ElementsManagement.removeCity(indexOfSelected);
       }
-    }else if(UIManagement.centerMode){
+    }else if(UIManagement.arbCenterMode){
       let tmpSet = new Set();
       let indexOfSelected = -1;
       for (let center in ElementsManagement.arbitraryCenters){
@@ -129,6 +129,18 @@ function mousePressed(){
       }else if(mouseButton == RIGHT && indexOfSelected != -1){
           ElementsManagement.removeArbitraryCenter(indexOfSelected);
       }
+    }else if(UIManagement.algCenterMode){
+      let tmpSet = new Set();
+      let indexOfSelected = -1;
+      for (let center in ElementsManagement.algorithmCenters){
+        tmpSelected = ElementsManagement.algorithmCenters[center].centerPressed();
+        tmpSet.add(tmpSelected);
+        if(tmpSelected)
+          indexOfSelected = center;
+      }
+      if(mouseButton == RIGHT && indexOfSelected != -1){
+          ElementsManagement.removeAlgorithmCenter(indexOfSelected);
+      }
     }
   }
 }
@@ -138,9 +150,13 @@ function mouseDragged() {
     for (let city in ElementsManagement.cities){
       ElementsManagement.cities[city].mouseDragged();
     }
-  }else{
+  }else if(UIManagement.arbCenterMode){
     for (let center in ElementsManagement.arbitraryCenters){
       ElementsManagement.arbitraryCenters[center].mouseDragged();
+    }
+  }else if(UIManagement.algCenterMode){
+    for (let center in ElementsManagement.algorithmCenters){
+      ElementsManagement.algorithmCenters[center].mouseDragged();
     }
   }
 }

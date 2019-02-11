@@ -41,6 +41,11 @@ ElementsManagement = {
         return tmpCenter;
     },
 
+    removeAlgorithmCenter: function(index){
+        ElementsManagement.algorithmCenters.splice(index,1);
+        UIManagement.legendAlgCenters.textContent = "Arb.Centers: "+ElementsManagement.legendAlgCenters.length; 
+    },
+
     clearAllElements: function(){
         ElementsManagement.cities.splice(0,ElementsManagement.cities.length);
         UIManagement.legendCities.textContent = "Cities: "+ElementsManagement.cities.length; 
