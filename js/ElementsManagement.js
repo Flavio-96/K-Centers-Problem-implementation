@@ -43,7 +43,7 @@ ElementsManagement = {
 
     removeAlgorithmCenter: function(index){
         ElementsManagement.algorithmCenters.splice(index,1);
-        UIManagement.legendAlgCenters.textContent = "Arb.Centers: "+ElementsManagement.legendAlgCenters.length; 
+        UIManagement.legendAlgCenters.textContent = "Alg.Centers: "+ElementsManagement.algorithmCenters.length; 
     },
 
     clearAllElements: function(){
