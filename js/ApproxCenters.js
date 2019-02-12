@@ -138,8 +138,13 @@ function mousePressed(){
         if(tmpSelected)
           indexOfSelected = center;
       }
-      if(mouseButton == RIGHT && indexOfSelected != -1){
-          ElementsManagement.removeAlgorithmCenter(indexOfSelected);
+      if(mouseButton == LEFT){
+        if(!tmpSet.has(true)){
+          newCenter = ElementsManagement.addAlgorithmCenter(x,y);
+          newCenter.display();
+        }
+      }else if(mouseButton == RIGHT && indexOfSelected != -1){
+        ElementsManagement.removeAlgorithmCenter(indexOfSelected);
       }
     }
   }

@@ -110,7 +110,7 @@ UIManagement = {
                     Swal.fire(
                         'All done!',
                         'The sketch is now clean.',
-                        'success').then(()=>UIManagement.showingAlert = false)
+                        'success').then( () => UIManagement.showingAlert = false)
                 }else
                     UIManagement.showingAlert = false;
           })
